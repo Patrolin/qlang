@@ -2,24 +2,24 @@ from dataclasses import dataclass
 from typing import Callable
 
 @dataclass
-class Operation:
+class Op:
     op_code: int
     arguments: tuple[int, ...]
     call: str = ""
 
 def Load(value: int):
-    return Operation(0, (value, ))
+    return Op(0, (value, ))
 
 def Call(name: str, *args: int):
-    return Operation(1, args, call=name)
+    return Op(1, args, call=name)
 
 def Return(*args: int):
-    return Operation(2, args)
+    return Op(2, args)
 
 @dataclass
 class Function:
     arguments: int
-    operations: list[Operation]
+    ops: list[Op]
     intrinsic: Callable | None = None
 
 class Program:
@@ -31,7 +31,7 @@ class Program:
     def sim(self):
         return self.sim_call(Call("main"), [])
 
-    def sim_call(self, call_op: Operation, prev_belt: list[int]):
+    def sim_call(self, call_op: Op, prev_belt: list[int]):
         print("sim_call", call_op)
         belt: list[int] = []
         for arg in call_op.arguments:
@@ -39,7 +39,7 @@ class Program:
         f = self.functions[call_op.call]
         if f.intrinsic:
             return f.intrinsic(belt)
-        for op in f.operations:
+        for op in f.ops:
             print("sim_call.2", op)
             result = self.sim_op(op, belt)
             if result:
@@ -51,7 +51,7 @@ class Program:
                     result.append(belt[-arg])
                 return result
 
-    def sim_op(self, op: Operation, belt: list[int]):
+    def sim_op(self, op: Op, belt: list[int]):
         if op.op_code == 0:
             return [op.arguments[0]]
         elif op.op_code == 1:
