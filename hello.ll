@@ -1,3 +1,4 @@
+; hello world in 2560 B
 @.str = private unnamed_addr constant [13 x i8] c"hello world\0A\00"
 
 %Opaque = type opaque
