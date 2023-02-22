@@ -28,7 +28,9 @@ def main(src: str):
     while True:
         token = tokens[i]
         # TODO: parse
-    # TODO: call sim
+    # TODO: call sim for constants
+    # TODO: write .ll # https://llvm.org/docs/LangRef.html
+    # TODO: run f"clang {name}.ll -o {name}.exe -nostdinc -nostdlib -nostdlib++ -no-integrated-cpp -z /subsystem:windows /entry:main -z User32.lib"
 
     file.close()
 
