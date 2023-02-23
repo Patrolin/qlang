@@ -25,10 +25,8 @@ define i32 @main() {
     %cast1 = getelementptr [13 x i8],[13 x i8]* @.str, i64 0, i64 0
     call i1 @AllocConsole() ; TODO: https://learn.microsoft.com/en-us/windows/console/createpseudoconsole ?
     %stdout = call %Handle* @GetStdHandle(%DWORD -11)
-    %null_ptr_dword = inttoptr i64 0 to %DWORD*
-    %null_ptr = inttoptr i64 0 to %Opaque*
     call void @Sleep(%DWORD 1000)
-    call i1 @WriteConsoleA(%Handle* %stdout, i8* %cast1, %DWORD 13, %DWORD* %null_ptr_dword, %Opaque* %null_ptr)
+    call i1 @WriteConsoleA(%Handle* %stdout, i8* %cast1, %DWORD 13, %DWORD* null, %Opaque* null)
     call void @Sleep(%DWORD 1000)
     ;call i1 @FreeConsole()
     ret i32 0

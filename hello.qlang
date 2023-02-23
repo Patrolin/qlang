@@ -1,0 +1,15 @@
+type WindowHandle = opaque
+//type char = i8, word = i16, dword = i32, qword = i64
+
+link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32 %options)
+
+void print(i8* string)
+    MessageBoxA(0, string, string, 64)
+
+main()
+    print("hello world\0A\00")
+
+
+// const str = i8[13] "hello world\n\00"
+// const a = i8[2] {1, 2}
+// i8[2] a = {1, 2}
