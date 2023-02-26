@@ -4,3 +4,4 @@ __pycache__
 zig-cache
 zig-out
 *.exe
+*.obj
