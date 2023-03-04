@@ -58,14 +58,11 @@ class Expression:
 
 if __name__ == "__main__":
     """
-    type WindowHandle = opaque
+    opaque WindowHandle
     link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32 %options)
 
-    print(i8* string)
-        MessageBoxA(0, string, string, 64)
-
     main()
-        print("hello world\0A\00")
+        MessageBoxA(0, "hello world\0A\00", 0, 64)
     """
     f = Function()
     f.statements = []
