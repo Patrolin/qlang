@@ -3,7 +3,7 @@ type WindowHandle = opaque
 
 link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32 %options)
 
-void print(i8* string)
+print(i8* string)
     MessageBoxA(0, string, string, 64)
 
 main()
@@ -13,3 +13,11 @@ main()
 // const str = i8[13] "hello world\n\00"
 // const a = i8[2] {1, 2}
 // i8[2] a = {1, 2}
+
+//const int phi(const int n)
+//    float* x = 2;
+//    while
+//        float y = (1 + &x) pow (1/n)
+//        if y == &x
+//            return y
+//        &x = y

@@ -1,61 +1,72 @@
 from typing import cast
 
+class StringBuilder:
+    def __init__(self):
+        self.string = ""
+
+    def write(self, string: str):
+        self.string += string
+
+# TODO: constants?
 class Function:
+    link: bool
     return_type: list["ValueType"]
-    statements: list["Statement"]
+    arguments: list["Expression"]
+    statements: list["Expression"]
 
-    def codegen(self) -> str:
-        NEWLINE = "\n"
-        return f"define {self.return_type} {NEWLINE.join(self.statements[i].codegen(i) for i in range(len(self.statements)))}"
+    def codegen(self, acc=StringBuilder(), variables: dict[str, "Expression"] = dict()) -> str:
+        acc.write(f"define {self.return_type} {{\n")
+        i = 0
+        for statement in self.statements:
+            acc.write("\n    ")
+            acc.write(statement.codegen(acc, variables, i))
+            i += 1
+        acc.write("}")
+        return acc.string
 
-class StatementType:
-    Declare = 0
-    Call = 1
-    Return = 2
-
-class Statement:
-    # int a = 1
-    # print(a)
-    # return a, b
-    statement_type: StatementType
-    name: str | None
-    value: "Expression | list[Expression]"
-
-    def codegen(self, i: int) -> str:
-        if self.statement_type == StatementType.Declare:
-            value = cast(Expression, self.value)
-            return value.codegen(i)
-        elif self.statement_type == StatementType.Call:
-            return ""
-        elif self.statement_type == StatementType.Return: # TODO: ???
-            return f"return {', '.join(v.codegen(i) for v in cast(list[Expression], self.value))}"
-        return "..."
-
+# TODO: full types
 class ValueType:
     Type = 0
     Number = 1
     String = 2
 
 class OpType:
-    NumberConstant = 0
-    StringConstant = 1
-    Variable = 2
-    Add = 3
-    Sub = 4
-    Mul = 5
-    Div = 6
+    NumberConstant = 0 # i32 123
+    StringConstant = 1 # @.1 = private unnamed_addr constant [13 x i8] c"hello world\0A\00" // @.1
+    Call = 2 # call i1 @WriteConsoleA(...)
+    Return = 3 # ret i32 0
+    SetVariable = 4
+    # int a = 123 # %1 = i32 123
+    # int* a = 123 # %1 = alloca ptr, align 8 \n store i32 123, ptr %1, align 8
+    GetVariable = 5
+    # a # i32 %1
+    # &a # %2 = load i32, ptr %1, align 8 // %2
+    Add = 6 # %2 = add i32 %1, i32 123 // %2
+    Sub = 7 # ...
+    Mul = 8
+    Div = 9
 
 class Expression:
     # 1 + 2*3
     value_type: ValueType
     op_type: OpType
-    left: "Expression" | None
-    right: "Expression" | None
+    left: "Expression | str | None"
+    right: "Expression | list[Expression] | None"
 
     def codegen(self, i: int) -> str:
         ...
 
 if __name__ == "__main__":
+    """
+    type WindowHandle = opaque
+    link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32 %options)
+
+    print(i8* string)
+        MessageBoxA(0, string, string, 64)
+
+    main()
+        print("hello world\0A\00")
+    """
     f = Function()
     f.statements = []
-    f.statements.append(Statement())
+    f.statements.append(Expression())
