@@ -1,3 +1,5 @@
+# TODO: passes: globaldce, inline, mem2reg, sroa, lcssa?, licm, loop-unswitch, loop-unroll, lowerswitch, (strip), (module-debuginfo)
+
 # TODO: alloca at entry -> mem2reg, sroa
 # %x = alloca i64, align 8
 

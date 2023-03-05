@@ -10,14 +10,19 @@ main()
     print("hello world\0A\00")
 
 
-// const str = i8[13] "hello world\n\00"
+// const str = i8[13] "hello world\n\00" // TODO auto add null??
 // const a = i8[2] {1, 2}
-// i8[2] a = {1, 2}
+// const i8[2] a = {1, 2}
 
 //const int phi(const int n)
-//    float* x = 2;
+//    float acc = 2
 //    while
-//        float y = (1 + &x) pow (1/n)
-//        if y == &x
-//            return y
-//        &x = y
+//        float next = 1 + acc pow (1/n)
+//        if next == acc
+//            return next
+//        acc = next
+
+//T* getRoot(T* node)
+//    while (node.parent)
+//        node = node.parent
+//    return node
