@@ -7,8 +7,8 @@ pub fn main() !void {
     // 1) auto check for zero - slow
     // 2) Itanium exception handler?
     // 3) SEH/longjump - very slow
-    var x = @as(i16, -32768) * @as(i16, b); // panic: integer overflow
-    var y = @divTrunc(100, b); // panic: divide by zero
+    var x = @as(i16, -32768) * @as(i16, b); // panic: integer overflow (-1)
+    var y = @divTrunc(100, b); // panic: divide by zero (0)
     dprint("Hello world {}, {}\n", .{x, y});
 }
 
