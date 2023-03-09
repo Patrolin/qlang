@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from sys import argv
 
+# TODO: parse -> semantic -> ir -> (opt -> codegen) / interpret
+
 # tokens
 @dataclass
 class Token:
