@@ -21,7 +21,7 @@ class Token:
         self.value = value
 
     def __repr__(self):
-        return f"Token({self.tokenType}, {self.slice}, {self.value})"
+        return f"Token({self.tokenType}, {self.slice}, {repr(self.value)})"
 
 def getNextToken(slice: Slice) -> Token:
     str = slice.data
@@ -80,14 +80,14 @@ def getNextToken(slice: Slice) -> Token:
                         acc += chr(code)
                         j += 4
                     elif str[j] in "0123456789":
-                        code = int(str[j:j + 4])
+                        code = int(str[j:j + 2])
                         acc += chr(code)
                         j += 2
                     else:
                         acc += str[j]
                         j += 1
             elif str[j] == "\"":
-                return Token(TokenType.String, Slice(str, i, j), acc)
+                return Token(TokenType.String, Slice(str, i, j + 1), acc)
             else:
                 acc += str[j]
                 j += 1
