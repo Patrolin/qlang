@@ -31,6 +31,7 @@ class Program:
     def sim(self):
         return self.sim_call(Call("main"), [])
 
+    # TODO: infinite belt
     def sim_call(self, call_op: Op, prev_belt: list[int]):
         print("sim_call", call_op)
         belt: list[int] = []
