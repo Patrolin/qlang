@@ -94,11 +94,14 @@ def getNextToken(slice: Slice) -> Token:
     raise SyntaxError(Slice(str, i, j))
 
 if __name__ == "__main__":
-    while True:
-        s = input("input: ")
-        slice = Slice(s)
+    try:
         while True:
-            next_token = getNextToken(slice)
-            print(next_token)
-            slice = Slice(slice.data, next_token.slice.end, slice.end)
-            if slice.start >= slice.end: break
+            s = input("input: ")
+            slice = Slice(s)
+            while True:
+                next_token = getNextToken(slice)
+                print(next_token)
+                slice = Slice(slice.data, next_token.slice.end, slice.end)
+                if slice.start >= slice.end: break
+    except KeyboardInterrupt:
+        pass
