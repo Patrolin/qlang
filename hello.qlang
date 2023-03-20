@@ -1,4 +1,4 @@
-type WindowHandle = opaque
+opaque WindowHandle
 //type char = i8, word = i16, dword = i32, qword = i64
 
 link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32 %options)

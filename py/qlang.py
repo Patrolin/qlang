@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from sys import argv
 
 def main(src: str):

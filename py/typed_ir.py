@@ -1,11 +1,18 @@
 from typing import cast
+from common import Slice, StringBuilder
 
-class StringBuilder:
-    def __init__(self):
-        self.string = ""
+class Type:
+    def __init__(self, type: int, slice: Slice, name: Slice):
+        self.type = type
+        self.slice = slice
+        self.name = name
 
-    def write(self, string: str):
-        self.string += string
+    def __repr__(self):
+        return f"Type(type={self.type}, name={self.name})"
+
+class TypeType:
+    Intrinsic = 0
+    Opaque = 1
 
 # TODO: constants?
 class Function:

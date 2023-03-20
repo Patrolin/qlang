@@ -10,6 +10,10 @@ def assert_equals(got: T, expected: T):
     if got != expected:
         fail(f"got: {got}; expected: {expected}")
 
+def assert_not_equals(got: T, expected: T):
+    if got == expected:
+        fail(f"got: {got}; expected: {expected}")
+
 # slice
 class Slice:
     def __init__(self, data: str, start=0, end=-1):
@@ -22,3 +26,14 @@ class Slice:
 
     def __getitem__(self, i: int):
         return self.data[i]
+
+    def __eq__(self, other):
+        return self.data[self.start:self.end] == other
+
+# string builder
+class StringBuilder:
+    def __init__(self):
+        self.string = ""
+
+    def write(self, string: str):
+        self.string += string

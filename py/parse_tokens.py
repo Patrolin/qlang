@@ -1,4 +1,4 @@
-from common import *
+from common import Slice
 
 SYMBOLS = "+-*/"
 _LOWER_ALPHABET = "abcdefghijklmnopqrstuvwxyz"
@@ -6,8 +6,8 @@ ALPHABET = _LOWER_ALPHABET + _LOWER_ALPHABET.upper()
 WHITESPACE = " \t\r\n"
 
 class TokenType:
-    Symbol = 0
-    Whitespace = 1
+    Whitespace = 0
+    Symbol = 1
     Number = 2
     NumberFloat = 3
     BracketLeft = 4
@@ -98,10 +98,9 @@ if __name__ == "__main__":
         while True:
             s = input("input: ")
             slice = Slice(s)
-            while True:
+            while slice.start < slice.end:
                 next_token = getNextToken(slice)
+                slice.start = next_token.slice.end
                 print(next_token)
-                slice = Slice(slice.data, next_token.slice.end, slice.end)
-                if slice.start >= slice.end: break
     except KeyboardInterrupt:
         pass
