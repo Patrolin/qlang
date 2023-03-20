@@ -6,7 +6,7 @@ link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32
 print(i8* string)
     MessageBoxA(0, string, string, 64)
 
-main()
+external main()
     print("hello world\0A\00")
 
 

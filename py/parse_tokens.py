@@ -7,6 +7,7 @@ WHITESPACE = " \t\r\n"
 
 class TokenType:
     Whitespace = 0
+    # TODO: split symbol and name
     Symbol = 1
     Number = 2
     NumberFloat = 3

@@ -1,21 +1,42 @@
-from typing import cast
 from common import Slice, StringBuilder
 
-class Type:
-    def __init__(self, type: int, slice: Slice, name: Slice):
-        self.type = type
-        self.slice = slice
+# module
+class Module:
+    def __init__(self, name: str):
         self.name = name
+        self.types: dict[str, Type] = dict()
+        self.functions: dict[str, Function] = dict()
 
     def __repr__(self):
-        return f"Type(type={self.type}, name={self.name})"
+        typesString = ',\n    '.join(f"{repr(k)}: {repr(v)}" for k, v in self.types.items())
+        functionsString = ',\n    '.join(f"{repr(k)}: {repr(v)}" for k, v in self.functions.items())
+        return f"Module(\n  name={repr(self.name)},\n  types={{{typesString}}},\n  functions={{{functionsString}}})"
 
-class TypeType:
+# type
+class Type:
+    def __init__(self, name: Slice, class_: int, export: bool):
+        self.name = name
+        self.class_ = class_
+        self.other_type: Type | None = None
+        self.export = export
+
+    def __repr__(self):
+        return f"Type(class_={self.class_}, name={self.name}, other_type={self.other_type}, export={self.export})"
+
+class TypeClass:
     Intrinsic = 0
     Opaque = 1
+    Array = 2
+    Pointer = 3
+
+class VariableSection:
+    Const = 0
+    Var = 1
+    Alloc = 2
 
 # TODO: constants?
 class Function:
+    name: Slice
     link: bool
     return_type: list["ValueType"]
     arguments: list["Expression"]

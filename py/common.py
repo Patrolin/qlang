@@ -22,13 +22,16 @@ class Slice:
         self.end = end if end >= 0 else len(data)
 
     def __repr__(self) -> str:
-        return f"Slice({repr(self.data[self.start:self.end])}, {self.start}..{self.end})"
+        return f"Slice({repr(self.value())}, {self.start}..{self.end})"
 
     def __getitem__(self, i: int):
         return self.data[i]
 
     def __eq__(self, other):
-        return self.data[self.start:self.end] == other
+        return self.value() == other
+
+    def value(self):
+        return self.data[self.start:self.end]
 
 # string builder
 class StringBuilder:
