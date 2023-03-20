@@ -1,12 +1,12 @@
 from typing import Any
 from common import Slice, assert_equals, assert_not_equals
 from parse_tokens import getNextToken, TokenType, Token
-from typed_ir import Type, TypeClass, Function, Module
+from typed_ir import Module, Type, TypeCategory, Variable, VariableCategory, Function
 
 DEFAULT_MODULE_NAME = ".default"
 ALL_MODULE_NAME = ".all"
 
-class AstParser:
+class Program:
     # common
     def __init__(self):
         # default types
@@ -14,7 +14,7 @@ class AstParser:
         for prefix in "isf":
             for width in ["8", "16", "32", "64"]:
                 name = Slice(f"{prefix}{width}")
-                defaultModule.types[name.value()] = Type(name, TypeClass.Intrinsic, export=True)
+                defaultModule.types[name.value()] = Type(name, TypeCategory.Intrinsic)
         defaultModule.types["char"] = defaultModule.types["i8"]
         defaultModule.types["word"] = defaultModule.types["i16"]
         defaultModule.types["dword"] = defaultModule.types["i32"]
@@ -37,6 +37,12 @@ class AstParser:
             raise SyntaxError(f"Redeclaration of type {type.name}")
         self.current_module.types[name] = type
 
+    def addVariable(self, variable: Variable):
+        name = variable.name.value()
+        if name in self.current_module.variables:
+            raise SyntaxError(f"Redeclaration of variable {variable.name}")
+        self.current_module.variables[name] = variable
+
     def addFunction(self, f: Function):
         name = f.name.value()
         if name in self.current_module.functions:
@@ -49,40 +55,44 @@ class AstParser:
         slice = Slice(text)
         while slice.start < slice.end:
             self.parseGlobalStatement(slice)
-            print(self.current_module)
-            token = getNextToken(slice)
-            slice.start = token.slice.end
+            print(slice)
+            #print(self.current_module)
 
     def parseGlobalStatement(self, slice: Slice):
-        export = False
         token1 = self.parseWhitespace(slice)
-        assert_equals(token1.tokenType, TokenType.Symbol)
-        if token1.slice == "export":
-            export = True
-            slice.start = token1.slice.end
-            token1 = self.parseWhitespace(slice)
-        assert_equals(token1.tokenType, TokenType.Symbol)
+        assert_equals(token1.tokenType, TokenType.Name)
         if token1.slice == "opaque":
             slice.start = token1.slice.end
-            name = self.parseWhitespace(slice)
-            slice.start = name.slice.end
-            self.addType(Type(name.slice, TypeClass.Opaque, export=export))
-        elif token1.slice == "link":
-            slice.start = token1.slice.end
-            f = self.parseFunctionHeader(slice)
-            self.addFunction(f)
+            name = self.parseName(slice)
+            self.addType(Type(name, TypeCategory.Opaque))
         else:
-            self.parseFunction(slice, export)
+            export = (token1.slice == "export")
+            if export:
+                slice.start = token1.slice.end
+                token1 = self.parseWhitespace(slice)
+            if token1.slice == "const":
+                variable = self.parseVariable(slice)
+                variable.export = export
+                variable.category = VariableCategory.Const
+                self.addVariable(variable)
+            elif token1.slice == "var":
+                variable = self.parseVariable(slice)
+                variable.export = export
+                variable.category = VariableCategory.Var
+                self.addVariable(variable)
+            else:
+                function = self.parseFunction(slice)
+                self.addFunction(function)
 
-    def parseFunction(self, slice: Slice, export: bool):
-        print("parseFunction", slice)
-        ...
+    def parseType(self, slice: Slice) -> int:
+        ... # TODO
+        raise NotImplementedError()
 
-    def parseFunctionHeader(self, slice: Slice) -> Function:
-        f = Function()
-        print("parseFunctionHeader", slice)
-        ...
-        return f
+    def parseName(self, slice: Slice) -> Slice:
+        token = getNextToken(slice)
+        assert_equals(token.tokenType, TokenType.Name)
+        slice.start = token.slice.end
+        return token.slice
 
     def parseWhitespace(self, slice: Slice) -> Token:
         token = getNextToken(slice)
@@ -99,9 +109,20 @@ class AstParser:
             token = getNextToken(slice)
         return token
 
+    def parseVariable(self, slice: Slice) -> Variable:
+        v = Variable(0, slice)
+        ... # TODO
+        raise NotImplementedError()
+
+    def parseFunction(self, slice: Slice) -> Function:
+        print("parseFunction", slice)
+        f = Function()
+        ... # TODO
+        raise NotImplementedError()
+
 if __name__ == "__main__":
-    parser = AstParser()
-    parser.parseAst("hello.qlang", """
+    program = Program()
+    program.parseAst("hello.qlang", """
     // hello world
     opaque WindowHandle
 main()

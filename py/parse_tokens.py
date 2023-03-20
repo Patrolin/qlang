@@ -1,19 +1,19 @@
 from common import Slice
 
-SYMBOLS = "+-*/"
+SYMBOL_CHARS = "+-*/"
 _LOWER_ALPHABET = "abcdefghijklmnopqrstuvwxyz"
-ALPHABET = _LOWER_ALPHABET + _LOWER_ALPHABET.upper()
-WHITESPACE = " \t\r\n"
+NAME_CHARS = _LOWER_ALPHABET + _LOWER_ALPHABET.upper() + "_"
+WHITESPACE_CHARS = " \t\r\n"
 
 class TokenType:
-    Whitespace = 0
-    # TODO: split symbol and name
+    Name = 0
     Symbol = 1
-    Number = 2
-    NumberFloat = 3
-    BracketLeft = 4
-    BracketRight = 5
-    String = 6
+    Whitespace = 2
+    Number = 3
+    NumberFloat = 4
+    BracketLeft = 5
+    BracketRight = 6
+    String = 7
 
 class Token:
     def __init__(self, tokenType: int, slice: Slice, value: int | float | str):
@@ -28,18 +28,19 @@ def getNextToken(slice: Slice) -> Token:
     str = slice.data
     i = j = slice.start
     end = slice.end
-    # symbol
-    if str[j] in SYMBOLS:
-        while j < end and str[j] in SYMBOLS:
+    # name
+    if str[j] in NAME_CHARS:
+        while j < end and str[j] in NAME_CHARS:
             j += 1
-        return Token(TokenType.Symbol, Slice(str, i, j), 0)
-    elif str[j] in ALPHABET:
-        while j < end and str[j] in ALPHABET:
+        return Token(TokenType.Name, Slice(str, i, j), 0)
+    # symbol
+    elif str[j] in SYMBOL_CHARS:
+        while j < end and str[j] in SYMBOL_CHARS:
             j += 1
         return Token(TokenType.Symbol, Slice(str, i, j), 0)
     # whitespace
-    elif str[j] in WHITESPACE:
-        while j < end and str[j] in WHITESPACE:
+    elif str[j] in WHITESPACE_CHARS:
+        while j < end and str[j] in WHITESPACE_CHARS:
             j += 1
         return Token(TokenType.Whitespace, Slice(str, i, j), 0)
     # number

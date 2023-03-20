@@ -6,40 +6,54 @@ class Module:
         self.name = name
         self.types: dict[str, Type] = dict()
         self.functions: dict[str, Function] = dict()
+        self.variables: dict[str, Variable] = dict()
 
     def __repr__(self):
         typesString = ',\n    '.join(f"{repr(k)}: {repr(v)}" for k, v in self.types.items())
         functionsString = ',\n    '.join(f"{repr(k)}: {repr(v)}" for k, v in self.functions.items())
-        return f"Module(\n  name={repr(self.name)},\n  types={{{typesString}}},\n  functions={{{functionsString}}})"
+        variablesString = ',\n    '.join(f"{repr(k)}: {repr(v)}" for k, v in self.variables.items())
+        return f"Module(\n  name={repr(self.name)},\n  types={{{typesString}}},\n  functions={{{functionsString}}},\n  variables={{{variablesString}}})"
 
+# TODO: wtf do you do according to https://llvm.org/docs/OpaquePointers.html ?
 # type
 class Type:
-    def __init__(self, name: Slice, class_: int, export: bool):
+    def __init__(self, name: Slice, category: int):
         self.name = name
-        self.class_ = class_
+        # TODO: normalized_name
+        self.category = category
         self.other_type: Type | None = None
-        self.export = export
 
     def __repr__(self):
-        return f"Type(class_={self.class_}, name={self.name}, other_type={self.other_type}, export={self.export})"
+        return f"Type(category={self.category}, name={self.name}, other_type={self.other_type})"
 
-class TypeClass:
+class TypeCategory:
     Intrinsic = 0
     Opaque = 1
     Array = 2
     Pointer = 3
 
-class VariableSection:
-    Const = 0
-    Var = 1
-    Alloc = 2
+# variable
+class Variable:
+    def __init__(self, type_id: int, name: Slice):
+        self.export = False
+        self.category = VariableCategory.Alloc
+        self.typeId = type_id
+        self.name = name
 
-# TODO: constants?
+class VariableCategory:
+    Alloc = 0
+    Const = 1
+    Var = 2
+
+# if link external: ccc
+# else: internal fastcc
 class Function:
     name: Slice
     link: bool
-    return_type: list["ValueType"]
-    arguments: list["Expression"]
+    return_type: list[Type]
+    argument_count: int
+    variablesNameToId: dict[str, int]
+    variables: list[Variable]
     statements: list["Expression"]
 
     def codegen(self, acc=StringBuilder(), variables: dict[str, "Expression"] = dict()) -> str:
@@ -52,11 +66,15 @@ class Function:
         acc.write("}")
         return acc.string
 
-# TODO: full types
-class ValueType:
-    Type = 0
-    Number = 1
-    String = 2
+class Expression:
+    # 1 + 2*3
+    value_type: Type
+    op_type: "OpType"
+    left: "Expression | str | None"
+    right: "Expression | list[Expression] | None"
+
+    def codegen(self, i: int) -> str:
+        ...
 
 class OpType:
     NumberConstant = 0 # i32 123
@@ -73,19 +91,10 @@ class OpType:
     Sub = 7 # ...
     Mul = 8
     Div = 9
-
-class Expression:
-    # 1 + 2*3
-    value_type: ValueType
-    op_type: OpType
-    left: "Expression | str | None"
-    right: "Expression | list[Expression] | None"
-
-    def codegen(self, i: int) -> str:
-        ...
+    #Cast?
 
 if __name__ == "__main__":
-    """
+    input = """
     opaque WindowHandle
     link i32 MessageBoxA(WindowHandle* %window_handle, i8* %message, i8* %title, i32 %options)
 
@@ -95,3 +104,10 @@ if __name__ == "__main__":
     f = Function()
     f.statements = []
     f.statements.append(Expression())
+
+    # goal = output: """
+    #link i32 @MessageBoxA(ptr %window_handle, ptr %message, ptr %title, i32 %options)
+    #define i32 @main() {
+    #    call void @MessageBoxA(0, "hello world\0A\00", 0, 64)
+    #}
+    #"""
