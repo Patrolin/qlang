@@ -1,30 +1,32 @@
 package bootstrap
 import "core:fmt"
 
+TokenType :: enum u32 {
+	Number,
+	String,
+	ProcKeyword,
+	Name,
+	Colon,
+	Equals,
+	Plus,
+	Minus,
+	Star,
+	Slash,
+	Caret,
+	Ampersand,
+	Pipe,
+	Tilde,
+	Comma,
+	LBracket,
+	RBracket,
+	LSquareBracket,
+	RSquareBracket,
+	LCurlyBracket,
+	RCurlyBracket,
+}
 Token :: struct {
 	start: u32,
-	type:  enum u32 {
-		Number,
-		Name,
-		String,
-		Colon,
-		Equals,
-		Plus,
-		Minus,
-		Star,
-		Slash,
-		Caret,
-		Ampersand,
-		Pipe,
-		Tilde,
-		Comma,
-		LBracket,
-		RBracket,
-		LSquareBracket,
-		RSquareBracket,
-		LCurlyBracket,
-		RCurlyBracket,
-	},
+	type:  TokenType,
 }
 
 isNumberToken :: proc(char: u8) -> bool {
@@ -33,23 +35,31 @@ isNumberToken :: proc(char: u8) -> bool {
 isNameToken :: proc(char: u8) -> bool {
 	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
 }
-tokenize :: proc(str: string) -> [dynamic]Token {
+tokenize :: proc(file: string) -> [dynamic]Token {
 	tokens := [dynamic]Token{}
 	i: u32 = 0
-	for i < u32(len(str)) { 	// TODO: iterate over runes?
-		start_char := str[i]
+	for i < u32(len(file)) { 	// TODO: iterate over runes?
+		start_char := file[i]
 		switch start_char {
+		// number, string
 		case '0' ..= '9':
 			append(&tokens, Token{start = i, type = .Number})
-			for i += 1; i < u32(len(str)) && isNumberToken(str[i]); i += 1 {}
-			continue
-		case 'a' ..= 'z', 'A' ..= 'Z':
-			append(&tokens, Token{start = i, type = .Name})
-			for i += 1; i < u32(len(str)) && isNameToken(str[i]); i += 1 {}
+			for i += 1; i < u32(len(file)) && isNumberToken(file[i]); i += 1 {}
 			continue
 		case '"':
 			append(&tokens, Token{start = i, type = .String})
-			for i += 1; i < u32(len(str)) && str[i] != '"'; i += (str[i] == '\\' ? 2 : 1) {}
+			for i += 1; i < u32(len(file)) && file[i] != '"'; i += (file[i] == '\\' ? 2 : 1) {}
+			continue
+		// keywords, name
+		case 'a' ..= 'z', 'A' ..= 'Z':
+			start_i := i
+			for i += 1; i < u32(len(file)) && isNameToken(file[i]); i += 1 {}
+			switch file[start_i:i] {
+			case "proc":
+				append(&tokens, Token{start = i, type = .ProcKeyword})
+			case:
+				append(&tokens, Token{start = i, type = .Name})
+			}
 			continue
 		// symbols
 		case ':':
@@ -95,15 +105,4 @@ tokenize :: proc(str: string) -> [dynamic]Token {
 		i += 1
 	}
 	return tokens
-}
-
-main :: proc() {
-	tokens := tokenize(
-		`
-		main :: proc() {
-			stdout := GetStdHandle(-11)
-			WriteFile(stdOut, "Hello world!", 12, 0, 0);
-		}`,
-	)
-	fmt.printfln("tokens: %v", tokens)
 }
