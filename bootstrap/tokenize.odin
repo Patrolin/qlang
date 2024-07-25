@@ -2,6 +2,7 @@ package bootstrap
 import "core:fmt"
 
 TokenType :: enum u32 {
+	Invalid,
 	Number,
 	String,
 	ProcKeyword,
@@ -35,6 +36,7 @@ isNumberToken :: proc(char: u8) -> bool {
 isNameToken :: proc(char: u8) -> bool {
 	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
 }
+// TODO: refactor to tokenizeOnce and call inside getNextToken()?
 tokenize :: proc(file: string) -> [dynamic]Token {
 	tokens := [dynamic]Token{}
 	i: u32 = 0

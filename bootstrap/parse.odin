@@ -1,6 +1,12 @@
 package bootstrap
 import "core:fmt"
 
+/* TODO:
+1) find top level names and create dummy nodes
+2) find entry proc and start parsing
+3) parse all remaining required names
+*/
+
 ProcNodeIndex :: distinct u32
 ProcNode :: struct {
 	name: Token,
@@ -12,11 +18,15 @@ ExpressionNode :: struct {
 	right: ExpressionNodeIndex,
 }
 Ast :: struct {
-	file:         string,
-	tokens:       []Token,
-	currentToken: u32,
-	procs:        map[string]ProcNode,
-	expressions:  [dynamic]ExpressionNode,
+	file:           string,
+	tokens:         []Token,
+	currentToken:   u32,
+	// TODO
+	untyped_names:  map[string]Token,
+	procs:          [dynamic]ProcNode,
+	pending_procs:  [dynamic]ProcNodeIndex,
+	required_procs: map[string]ProcNodeIndex,
+	expressions:    [dynamic]ExpressionNode,
 }
 getNextToken :: proc(ast: ^Ast) -> Token {
 	return ast.tokens[ast.currentToken]
