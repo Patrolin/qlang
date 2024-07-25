@@ -1,2 +1,2 @@
 # qlang
-Test compiler ideally w/ Mill compatibility
+Test compiler
