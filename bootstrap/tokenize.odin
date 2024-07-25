@@ -26,7 +26,7 @@ isNumberToken :: proc(char: u8) -> bool {
 tokenize :: proc(str: string) -> [dynamic]Token {
 	tokens := [dynamic]Token{}
 	i: u32 = 0
-	for i < u32(len(str)) {
+	for i < u32(len(str)) { 	// TODO: iterate over runes?
 		start_char := str[i]
 		switch start_char {
 		case '0' ..= '9':
