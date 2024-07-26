@@ -18,9 +18,7 @@ ExpressionNode :: struct {
 	right: ExpressionNodeIndex,
 }
 Ast :: struct {
-	file:           string,
-	tokens:         []Token,
-	currentToken:   u32,
+	file_view:      FileView,
 	// TODO
 	untyped_names:  map[string]Token,
 	procs:          [dynamic]ProcNode,
@@ -28,52 +26,51 @@ Ast :: struct {
 	required_procs: map[string]ProcNodeIndex,
 	expressions:    [dynamic]ExpressionNode,
 }
-getNextToken :: proc(ast: ^Ast) -> Token {
-	return ast.tokens[ast.currentToken]
-}
-eatToken :: proc(ast: ^Ast) {
-	ast.currentToken += 1
-}
-parseAst :: proc(file: string, tokens: []Token) -> (ast: Ast) {
-	ast.file = file
-	ast.tokens = tokens
+parseAst :: proc(file_view: FileView) -> (ast: Ast) {
+	ast.file_view = file_view
 	for {parseTopLevel(&ast)}
 	return ast
 }
-parseExpected :: proc(ast: ^Ast, type: TokenType) -> Token {
-	token := getNextToken(ast)
+parseToken :: proc(ast: ^Ast, type: TokenType) -> Token {
+	token := getNextToken(&ast.file_view)
 	fmt.assertf(token.type == type, "Invalid token: %v, expected: .%v", token, type)
-	eatToken(ast)
+	return token
+}
+parseKeyword :: proc(ast: ^Ast, keyword: string) -> Token {
+	token := getNextToken(&ast.file_view)
+	using ast.file_view
+	fmt.assertf(
+		token.type == .Name || str[i:i + u32(len(keyword))] != keyword,
+		`Invalid token: %v, expected: keyword "%v"`,
+		token,
+		str[i:i + u32(len(keyword))],
+	)
 	return token
 }
 parseTopLevel :: proc(ast: ^Ast) {
-	// <name> :: proc() {}
-	parseExpected(ast, .Name)
-	parseExpected(ast, .Colon)
-	parseExpected(ast, .Colon)
-	parseExpected(ast, .ProcKeyword)
-	parseExpected(ast, .LBracket)
-	parseExpected(ast, .RBracket)
-	parseExpected(ast, .LCurlyBracket)
-	for getNextToken(ast).type != .RCurlyBracket {
+	// <Name> :: proc() {...}
+	parseToken(ast, .Name)
+	parseToken(ast, .ColonColon)
+	parseKeyword(ast, "proc")
+	parseToken(ast, .LBracket)
+	parseToken(ast, .RBracket)
+	parseToken(ast, .LCurlyBracket)
+	for peekNextToken(&ast.file_view).type != .RCurlyBracket {
 		parseFunctionLevel(ast)
 	}
-	eatToken(ast)
+	ast.file_view.i += 1
 }
 parseFunctionLevel :: proc(ast: ^Ast) {
-	parseExpected(ast, .Name)
-	parseExpected(ast, .Colon)
-	parseExpected(ast, .Equals)
+	parseToken(ast, .Name) // TODO: better error messages
+	parseToken(ast, .ColonEquals)
 	parseExpressionLevel(ast)
 }
 parseExpressionLevel :: proc(ast: ^Ast) {
-	token0 := getNextToken(ast)
+	token0 := getNextToken(&ast.file_view)
 	#partial switch token0.type {
 	case .Name:
-		eatToken(ast)
-		token1 := getNextToken(ast)
+		token1 := getNextToken(&ast.file_view)
 		if token1.type == .LBracket {
-			//eatToken(ast)
 			// TODO: function
 		} else {
 			// TODO: variable
