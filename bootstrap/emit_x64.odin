@@ -1,5 +1,6 @@
 package bootstrap
 
+// TODO: vectorize and weave
 // TODO: write file
 // TODO: write windows/linux executable headers
 // TODO: write rdata
