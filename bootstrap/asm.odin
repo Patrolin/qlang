@@ -12,7 +12,7 @@ main :: proc() {
 	LoadConstIns{.s32, 12}
 	LoadConstIns{.s32, 0}
 	CallIns{procs.WriteFile, {2, 0, 3, 4, 4}}
-	RetIns{{}}
+	RetIns{{}} // TODO: schedule in time-reverse order
 ]
 */
 InstructionDataType :: enum u32 {
