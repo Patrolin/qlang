@@ -94,7 +94,9 @@ Instruction :: union {
 // NOTE: enter at top, leave anywhere
 ExtendedBasicBlock :: struct {
 	instructions: [dynamic]Instruction,
+	refCount:     u32,
 }
 ProcedureBlock :: struct {
 	basicBlocks: map[ExtendedBasicBlockId]ExtendedBasicBlock,
+	start:       ExtendedBasicBlockId,
 }
