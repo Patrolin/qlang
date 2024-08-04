@@ -100,3 +100,5 @@ ProcedureBlock :: struct {
 	basicBlocks: map[ExtendedBasicBlockId]ExtendedBasicBlock,
 	start:       ExtendedBasicBlockId,
 }
+
+// TODO: vectorize and weave optimizations

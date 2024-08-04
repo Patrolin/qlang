@@ -2,7 +2,7 @@ package bootstrap
 import "core:fmt"
 
 TokenType :: enum u32 {
-	// variable size
+	// N-grams
 	Number,
 	String,
 	Name,
@@ -57,7 +57,7 @@ isNumberToken :: proc(char: u8) -> bool {
 	)
 }
 isNameToken :: proc(char: u8) -> bool {
-	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z')
+	return (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || char == '_'
 }
 eatToken :: proc(view: ^FileView, token: Token) {
 	view.i = token.end
@@ -76,7 +76,7 @@ peekNextToken :: proc(view: ^FileView) -> (token: Token) {
 	}
 	token.start = i
 	switch str[i] {
-	// variable size
+	// N-grams
 	case '0' ..= '9':
 		for i += 1; i < u32(len(str)) && isNumberToken(str[i]); i += 1 {}
 		token.end = i
