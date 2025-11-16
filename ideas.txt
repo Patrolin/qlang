@@ -1,0 +1,62 @@
+// -- compile time --
+// builtin types
+untyped_integer
+uintptr
+intptr
+u64
+u32
+u16
+u8
+i64
+i32
+i16
+i8
+untyped_float
+f64
+f32
+... /* other floats, if we have native support for them */
+
+// constant values
+12 /* const untyped_integer (defaults to const intptr) */
+12.3e45 /* const untyped_float (defaults to error) */
+u64(12) /* const u64 */
+u64(12.3e45) /* const f64 */
+
+// constants
+FOO :: 1
+BAR :: min(FOO, 7)
+
+// distinct types
+byte :: u8 /* alias for u8 */
+Size :: distinct uintptr /* must be explicitly cast to/from other types */
+
+// enums /* defaults to smallest int that can fit the values */
+SomeType :: enum {
+  First,
+  Second = 7,
+}
+
+// bitset
+SomeBitset :: bitset {
+  First, /* true if the first bit is set */
+  Second = 0b010 at 0b110, /* true if the second bit is set, but the third isn't */
+  Third = 0b100 at 0b110, /* true if the third bit is set, but the second isn't */
+}
+
+// functions (can be evaluated at compile time, if all inputs are constant)
+min :: fun(x, y: intptr) {
+  return x <= y ? x : y
+}
+
+// -- runtime --
+// structs
+Slice :: struct { /* NOTE: builtin Slice type! */
+  ptr: ^byte,
+  count: Size,
+}
+
+// procedures
+main :: proc() {
+  printf("FOO: %", FOO)
+  printf("BAR: %", BAR)
+}
