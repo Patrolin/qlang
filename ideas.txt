@@ -48,6 +48,11 @@ min :: fun(x, y: intptr) {
   return x <= y ? x : y
 }
 
+// static if
+#if condition() {
+  /* ... */
+} #else #assert(false)
+
 // -- runtime --
 // structs
 Slice :: struct { /* NOTE: builtin Slice type! */
@@ -60,3 +65,22 @@ main :: proc() {
   printf("FOO: %", FOO)
   printf("BAR: %", BAR)
 }
+
+// if
+if foo {
+  /* ... */
+} else if bar {
+  /* ... */
+}
+
+// for
+for {/* ... */} /* loop forever */
+for condition {/* ... */} /* loop while condition */
+for i := 0; i < n; i++ {/* ... */} /* standard for loop */
+
+// TODO: generic functions/procedures
+max :: fun(x, y: $T in integers) {
+  return x >= y ? x : y
+}
+
+// TODO: multiple return values
